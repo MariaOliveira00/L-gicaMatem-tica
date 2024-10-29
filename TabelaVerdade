@@ -1,0 +1,55 @@
+import itertools
+
+def create_truth_table(expression, variables):
+   
+    results = []
+    for values in itertools.product([False, True], repeat=len(variables)):
+        env = dict(zip(variables, values))
+        result = eval(expression, {}, env)
+        results.append((values, result))
+    return results
+
+def display_truth_table(truth_table, variables):
+   
+    print(f"\n{' | '.join(variables)} | Resultado")
+    print("-" * (len(variables) * 4 + 10))
+    for values, result in truth_table:
+        row = " | ".join(f"{'T' if v else 'F'}" for v in values)
+        print(f"{row} | {'T' if result else 'F'}")
+
+def check_answer(user_answers, truth_table):
+   
+    return all(user_answer == result for user_answer, (_, result) in zip(user_answers, truth_table))
+
+def start_game():
+    levels = [
+        {"expression": "A and B", "variables": ["A", "B"]},
+        {"expression": "A or B", "variables": ["A", "B"]},
+        {"expression": "A and (B or C)", "variables": ["A", "B", "C"]},
+    ]
+
+    for level, challenge in enumerate(levels, 1):
+        print(f"\n--- Nível {level} ---")
+        expression = challenge["expression"]
+        variables = challenge["variables"]
+        print(f"Expressão: {expression}")
+
+        truth_table = create_truth_table(expression, variables)
+        display_truth_table(truth_table, variables)
+
+        user_answers = []
+        print("\nDigite 'T' para Verdadeiro e 'F' para Falso para cada linha de resultado:")
+        for values, _ in truth_table:
+            row = " e ".join(f"{'T' if v else 'F'}" for v in values)
+            user_input = input(f"{row}: ").strip().upper()
+            user_answers.append(user_input == "T")
+
+        if check_answer(user_answers, truth_table):
+            print("Correto! Você avançou para o próximo nível.")
+        else:
+            print("Resposta incorreta. Tente novamente.")
+            break
+    else:
+        print("Parabéns! Você completou todos os níveis do jogo.")
+
+start_game()
